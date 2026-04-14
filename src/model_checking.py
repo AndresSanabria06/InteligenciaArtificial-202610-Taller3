@@ -106,7 +106,13 @@ def check_valid(formula: Formula) -> bool:
           Alternativamente, verifica que sea verdadera en TODOS los modelos.
     """
     # === YOUR CODE HERE ===
-    raise NotImplementedError("Implementa check_valid()")
+    atomos = get_atoms(formula)
+    modelos_del_mundo = get_all_models(atomos)
+    for modelo in modelos_del_mundo:
+        evaluar_tautologia = evaluate(formula, modelo)
+        if evaluar_tautologia==False:
+            return False
+    return True
     # === END YOUR CODE ===
 
 
