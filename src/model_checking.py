@@ -137,7 +137,26 @@ def check_entailment(kb: list[Formula], query: Formula) -> bool:
           y la query sea falsa.
     """
     # === YOUR CODE HERE ===
-    raise NotImplementedError("Implementa check_entailment()")
+    atomos = set()
+    for form in kb:
+        atomos_en_form = get_atoms(form)
+        for atomo in atomos_en_form:
+            atomos.add(atomo)
+    atomos_en_query= get_atoms(query)
+    for atomo in atomos_en_query:
+        atomos.add(atomo)
+    modelos_del_mundo = get_all_models(atomos)
+    for modelo in modelos_del_mundo:
+        kb_true = True
+        for form in kb:
+            evaluar = evaluate(form, modelo)
+            if evaluar==False:
+                kb_true=False
+        if kb_true==True:
+            query_result=evaluate(query,modelo)
+            if query_result==False:
+                return False
+    return True
     # === END YOUR CODE ===
 
 
