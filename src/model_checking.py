@@ -31,7 +31,27 @@ def get_all_models(atoms: set[str]) -> list[dict[str, bool]]:
           Cada bit corresponde al valor de verdad de un atomo.
     """
     # === YOUR CODE HERE ===
-    raise NotImplementedError("Implementa get_all_models()")
+    lista_atomos = list(atoms)
+    num_modelos = len(lista_atomos)
+    total = 2** num_modelos
+    modelos_del_mundo = []
+    for i in range(total):
+        paso_binario = bin(i)
+        paso_binario = paso_binario[2:]
+        while len(paso_binario)<num_modelos:
+            paso_binario = "0" + paso_binario
+        bit = paso_binario
+        curr_model = {}
+        for j in range(num_modelos):
+            curr_atom = lista_atomos[j]
+            curr_bit = bit[j]
+            if curr_bit == "1":
+                valor_de_verdad = True
+            else:
+                valor_de_verdad = False
+            curr_model[curr_atom]=valor_de_verdad
+        modelos_del_mundo.append(curr_model)
+    return modelos_del_mundo
     # === END YOUR CODE ===
 
 
