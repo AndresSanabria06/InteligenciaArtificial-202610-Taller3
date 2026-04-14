@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from src.logic_core import Formula
 
-from logic_core import get_atoms
+from src.logic_core import get_atoms
 
-from logic_core import evaluate
+from src.logic_core import evaluate
 
 
 def get_all_models(atoms: set[str]) -> list[dict[str, bool]]:
