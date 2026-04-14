@@ -10,6 +10,10 @@ from __future__ import annotations
 
 from src.logic_core import Formula
 
+from logic_core import get_atoms
+
+from logic_core import evaluate
+
 
 def get_all_models(atoms: set[str]) -> list[dict[str, bool]]:
     """
@@ -74,7 +78,13 @@ def check_satisfiable(formula: Formula) -> tuple[bool, dict[str, bool] | None]:
           la formula en cada uno usando evaluate().
     """
     # === YOUR CODE HERE ===
-    raise NotImplementedError("Implementa check_satisfiable()")
+    atomos = get_atoms(formula)
+    modelos_del_mundo = get_all_models(atomos)
+    for modelo in modelos_del_mundo:
+        evaluar_satisfiable = evaluate(formula, modelo)
+        if evaluar_satisfiable == True:
+            return (True, modelo)
+    return (False, None)
     # === END YOUR CODE ===
 
 
