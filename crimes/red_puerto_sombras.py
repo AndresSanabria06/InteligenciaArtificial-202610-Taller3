@@ -42,7 +42,108 @@ def crear_kb() -> KnowledgeBase:
     cartel_portuario  = Term("cartel_portuario")
 
     # === YOUR CODE HERE ===
+    # Hechos — registros oficiales (coartadas)
+    kb.add_fact(Predicate("registro_oficial_fuera", (capitan_herrera,)))
+    kb.add_fact(Predicate("registro_oficial_fuera", (inspector_nova,)))
 
+    # Hechos — acciones y roles
+    kb.add_fact(Predicate("firma_manifiestos_carga",   (oficial_duarte,)))
+    kb.add_fact(Predicate("manifiestos_fraudulentos",  (oficial_duarte,)))
+    kb.add_fact(Predicate("acceso_bodega",             (marinero_pinto,)))
+    kb.add_fact(Predicate("visto_introduciendo_ilegal", (marinero_pinto,)))
+
+    # Hechos — sin coartada
+    kb.add_fact(Predicate("sin_coartada", (oficial_duarte,)))
+    kb.add_fact(Predicate("sin_coartada", (marinero_pinto,)))
+
+    # Hechos — red y cartel
+    kb.add_fact(Predicate("pertenece_cartel", (oficial_duarte,  cartel_portuario)))
+    kb.add_fact(Predicate("pertenece_cartel", (marinero_pinto,  cartel_portuario)))
+
+    # Hechos — informante y acusaciones
+    kb.add_fact(Predicate("reportado_informante", (oficial_duarte,)))
+    kb.add_fact(Predicate("reportado_informante", (marinero_pinto,)))
+    kb.add_fact(Predicate("acusa",                (capitan_herrera, oficial_duarte)))
+
+    # Reglas
+    # Registro oficial fuera del puerto -> descartado
+    kb.add_rule(Rule(
+        head=Predicate("descartado", (Term("$X"),)),
+        body=(Predicate("registro_oficial_fuera", (Term("$X"),)),)
+    ))
+
+    # Firma manifiestos + manifiestos fraudulentos -> fraude documental
+    kb.add_rule(Rule(
+        head=Predicate("fraude_documental", (Term("$X"),)),
+        body=(
+            Predicate("firma_manifiestos_carga",  (Term("$X"),)),
+            Predicate("manifiestos_fraudulentos", (Term("$X"),)),
+        )
+    ))
+
+    # Acceso a bodega + visto introduciendo -> introduce contrabando
+    kb.add_rule(Rule(
+        head=Predicate("introduce_contrabando", (Term("$X"),)),
+        body=(
+            Predicate("acceso_bodega",              (Term("$X"),)),
+            Predicate("visto_introduciendo_ilegal", (Term("$X"),)),
+        )
+    ))
+
+    # Fraude documental + sin coartada -> culpable
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (Term("$X"),)),
+        body=(
+            Predicate("fraude_documental", (Term("$X"),)),
+            Predicate("sin_coartada",      (Term("$X"),)),
+        )
+    ))
+
+    # Introduce contrabando + sin coartada -> culpable
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (Term("$X"),)),
+        body=(
+            Predicate("introduce_contrabando", (Term("$X"),)),
+            Predicate("sin_coartada",          (Term("$X"),)),
+        )
+    ))
+
+    # Mismo cartel -> comparten red
+    kb.add_rule(Rule(
+        head=Predicate("comparte_red", (Term("$X"), Term("$Y"))),
+        body=(
+            Predicate("pertenece_cartel", (Term("$X"), Term("$C"))),
+            Predicate("pertenece_cartel", (Term("$Y"), Term("$C"))),
+        )
+    ))
+
+    # Dos culpables que comparten red -> operación conjunta
+    kb.add_rule(Rule(
+        head=Predicate("operacion_conjunta", (Term("$X"), Term("$Y"))),
+        body=(
+            Predicate("culpable",      (Term("$X"),)),
+            Predicate("culpable",      (Term("$Y"),)),
+            Predicate("comparte_red",  (Term("$X"), Term("$Y"))),
+        )
+    ))
+
+    # Descartado que acusa -> testimonio confiable
+    kb.add_rule(Rule(
+        head=Predicate("testimonio_confiable", (Term("$X"), Term("$Y"))),
+        body=(
+            Predicate("descartado", (Term("$X"),)),
+            Predicate("acusa",      (Term("$X"), Term("$Y"))),
+        )
+    ))
+
+    # Al menos un culpable en el cartel -> red activa
+    kb.add_rule(Rule(
+        head=Predicate("red_activa", (Term("$C"),)),
+        body=(
+            Predicate("pertenece_cartel", (Term("$X"), Term("$C"))),
+            Predicate("culpable",         (Term("$X"),)),
+        )
+    ))
     # === END YOUR CODE ===
 
     return kb
